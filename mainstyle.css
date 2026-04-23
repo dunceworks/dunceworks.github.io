@@ -1,5 +1,7 @@
 /* General/Desktop */
-
+*, *::before, *::after {
+    box-sizing: border-box;
+}
 body {
     line-height: 1.6;
     font-size: 16px; 
@@ -42,11 +44,12 @@ ul{
     min-height: 80vh;
 }
 
-.largea{
-    font-size: 1.15vw;
+.largea {
+    font-size: 1.1rem; 
     color: #cf6679;
-    padding-right: 5%;
+    padding: 10px 15px;
     margin-left: 1vw;
+    display: inline-block;
 }
 
 .centered {
@@ -72,7 +75,7 @@ ul{
     padding: 2%;
     width: 96%;
     /* Removed fixed height: 15vw to allow content to grow */
-    min-height: 250px; 
+    height: auto;
     background-color: rgb(45,45,48);
     color: rgb(249, 249, 249);
     overflow: hidden;
@@ -87,12 +90,23 @@ ul{
 .project_element {
     flex: 1;
     padding: 15px;
+    min-width: 0; /* THE MAGIC FIX: Allows the flex box to shrink below the image's actual size */
 }
 
 .project_img img {
-    max-width: 100%; /* Ensures image never overflows its container */
+    width: 100%; /* Forces the image to exactly match the width of its half of the container */
+    max-width: 100%; 
     height: auto;
     border-radius: 8px;
+    display: block;
+    margin: 0 auto;
+}
+
+.project_img img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto; /* Centers image within its half of the blurb */
 }
 
 img{
@@ -155,29 +169,27 @@ h2 { font-size: 1.8rem; }
     font-weight: bold; 
 }
 
+a.text {
+    display: block;
+    text-decoration: none;
+}
 
 /* Mobile section */
 @media screen and (max-width: 768px) {
-    .body {
-        width: 95%;
-        margin: 10px auto;
+    .project_blurb.left, 
+    .project_blurb.right {
+        flex-direction: column !important; /* Forces vertical stack */
+        text-align: center;
     }
 
-    .project_blurb {
-        flex-direction: column;
-        height: auto;     
+    /* Target the image specifically to move to the top */
+    .project_img {
+        order: -1; /* Moves image above text on mobile */
+        width: 100%;
+        padding-bottom: 20px;
     }
 
     .project_element {
         width: 100%;
-        padding: 10px;
-        box-sizing: border-box;
     }
-
-    .project_right {
-        order: -1; 
-    }
-
-    h1 { font-size: 1.6rem; }
-    .largea { font-size: 1rem; display: block; margin: 10px 0; }
 }
