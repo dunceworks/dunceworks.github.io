@@ -20,6 +20,7 @@
                 <a class="largea inline" href="/people.html"><b>Team Members</b></a>
                 <a class="largea inline" href="/architecture.html"><b>Architecture</b></a>
                 <a class="largea inline" href="/demo.html"><b>Demo</b></a>
+                <a class="largea inline" href="https://github.com/dunceworks/FAST-AR"><b>GitHub Repo</b></a>
             </nav>
 
         <!-- Start of content  -->
@@ -30,7 +31,7 @@
                 <h2><i> Downscaler</i></h2>
 
                 <div class="caption_box centered">
-                    <img style="width: 100%" alt="Block diagram of the FAST-AR accelerator." src="/pictures/block_diagram.png">
+                    <img style="width: 100%" alt="Block diagram of the FAST-AR accelerator." src="./pictures/block_diagram.png">
                 </div>
                     <h3>Hardware-Accelerated Video Downscaler</h3>
 
@@ -57,33 +58,35 @@ To run the MediaPipe gesture recognition model efficiently on the Zynq Processin
                 <div class="caption_box centered">
                     <img style="width: 100%" src="./pictures/parametizable_downscaler.png" alt="Diagramatic view of the downscaler operation/theory.">
                 </div>
+                <h3>Architecture and Data Flow</h3>
                 <p>
-                    &emsp; 
+                     
 
-Architecture and Data Flow
 
-The downscaler sits directly in the camera's AXI-Stream pipeline. This direct-stream approach bypasses the DDR memory entirely for the 1080p input.
+                    &emsp;
+                    The downscaler sits directly in the camera's AXI-Stream pipeline allowing us to avoid costly buffering in main memory until the final frame is ready.</br>
+                    <b>Input:</b> Raw 1080p video streamed directly from the camera sensor at a ~75MHz pixel clock. </br> 
+                    <b>Output:</b> A 224x224 RGB frame (~150 KB) written to a /dev/shm RAM disk via a Video Direct Memory Access (VDMA) block.</br>
+                    <b>Logic:</b> The module utilizes a parameterizable adder tree for the downscaling math, requiring zero DSP slices. 
+                </p>
+                <br><h3>Processing and Latency</h3>
+                <p>
+                    &emsp;The downscaler's fabric is clocked at 200MHz giving us a theoretical compute time per frame of around 75 µs based solely on logic. Because we have to wait
+                    for the camera to stream in the pixels we are effectively limiting our processing time to around 33 ms due to the effective 75 MHz pixel clock. 
+                    Additionally, since we do a fixed crop of only around the top 4/5's of the frame (since we crop only until the bottom 92 pixels), the compute is fully
+                    hidden within the camera's streaming time. Once the last line is processed tlast is asserted, tvalid is deasserted and the frame is committed to memory. 
+                </p>    
+                <br><h3>Software vs. Hardware Comparison</h3>
+                <p>
+                    <b>Hardware Pipeline:</b> With the 4/5 early-exit crop, the downscaled 224x224 frame is fully processed and could be committed to memory in sub 30 ms.
+                    The small 224x224 frame is then committed to memory and ready for the ARM cores to process.   <br><br>
 
-    Input: Raw 1080p video streamed directly from the camera sensor at a ~75MHz pixel clock.
+                    <b>Estimated Software Pipeline:</b> A standard software implementation would require the full 1080p frame to be buffered first in main memory 
+                    (taking around 33ms to do so), before CPU downscaling can be performed, after which the downscaled frame can be committed to memory. This requires 
+                    a total of 2 RAM writes (one for the full frame, one for the downscaled frame) and additional CPU overhead for downscaling.<br><br>
 
-    Output: A 224x224 RGB frame (~150 KB) written to a /dev/shm RAM disk via a Video Direct Memory Access (VDMA) block.
-
-    Logic: The module utilizes a parameterizable adder tree for the downscaling math, requiring zero DSP slices. Additionally, color channel correction (converting the camera's output to the RGB format expected by MediaPipe) is handled entirely through wire routing on the AXI bus, requiring zero logic gates and adding zero latency.
-
-Processing and Latency
-
-The downscaler's fabric is clocked at 200MHz. At this speed, the theoretical compute time for the RTL logic to process the data is roughly 70 µs. However, because the system is I/O-bound by the camera's live ~75MHz feed, the computation is effectively hidden within the camera's natural exposure and readout time.
-
-To further reduce latency, the downscaler implements a 3/4 frame crop. Since the user's hand gestures naturally occur in the upper portion of the camera's view, the module stops processing and fires its final tlast signal after reading 75% of the 1080p frame.
-Software vs. Hardware Comparison
-
-This hardware implementation minimizes both total latency and CPU utilization.
-
-    Hardware Pipeline: With the 3/4 early-exit crop, the downscaled 224x224 frame is fully processed and committed to memory in approximately 25 ms—before the camera has even finished capturing the bottom 25% of the frame.
-
-    Estimated Software Pipeline: A standard software approach would require waiting for the full 1080p frame to buffer into RAM (~33.3 ms at 30 FPS), followed by a CPU-bound resize operation (estimated at ~30 ms under load). This would result in a total latency of roughly ~63 ms.
-
-By handling the resizing and color swapping inline as the pixels arrive, we eliminate the preprocessing overhead, allowing the Zynq's ARM cores to dedicate their full resources to running the AI inference.
+                    By doing the downscaling in hardware we avoid buffering the full RGB frame in main memory, saving a single large RAM write and also the CPU
+                    overhead of downscaling, leaving our speed entirely constrained by the camera's streaming time and not the CPU's processing time.
                 </p>
 
 
