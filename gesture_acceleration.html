@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Gesture Accelerator Hardware</title>
+        <link rel="stylesheet" href="mainstyle.css">
+        <link rel="icon" type="image/x-icon" href="./pictures/cg_300nm.png">
+    </head>
+
+    <body>
+        <div class="body">
+            <header>
+                <h1>Gesture Accelerator Hardware</h1>
+            </header>
+            
+            <nav class="header">
+                <a class="largea inline" href="/index.html"><b>FAST-AR</b></a>
+                <a class="largea inline" href="/people.html"><b>Team Members</b></a>
+                <a class="largea inline" href="/architecture.html"><b>Architecture</b></a>
+                <a class="largea inline" href="/demo.html"><b>Demo</b></a>
+            </nav>
+
+        <!-- Start of content  -->
+
+        <!-- Descriptions of projects with links  -->
+
+            <article class="page_content"> 
+                <h2><i> Downscaler</i></h2>
+
+                <div class="caption_box centered">
+                    <img style="width: 100%" alt="Block diagram of the FAST-AR accelerator." src="/pictures/block_diagram.png">
+                </div>
+                    <h3>Hardware-Accelerated Video Downscaler</h3>
+
+To run the MediaPipe gesture recognition model efficiently on the Zynq Processing System, the 1080p camera feed must be downscaled to a 224x224 RGB format. Rather than relying on the ARM CPU for image processing, we implemented a custom RTL downscaler in the FPGA fabric to handle this step prior to memory storage.
+
+            
+                <!--      DIAGRAM      -->           
+                    <div class="project_blurb left">
+                        <div class="project_element">
+                            <h2 class="pl">Hardware Flow Diagram</h2>
+                            <p>
+                                Here we can see the abstracted view of the hardware/PL design. Generally, A MIPI CSI camera (PCAM5) clocked at 200MHz feeds into a 
+                                demosaic module (Vivado IP) converting the raw bayer data into standard RGB. Here, the data stream splits. One stream is grayscaled,
+                                while the other stream remains RGB. The RGB stream is then fed into the <b>downscaler (detailed below)</b>
+                            </p>
+                        </div>
+                        
+                        <div class="project_element project_img">
+                            <img src="./pictures/fastar_arch_cropped.png" alt="Hardware Block Diagram">
+                        </div>
+                    </div>
+                <!--      END DIAGRAM      -->           
+
+                <div class="caption_box centered">
+                    <img style="width: 100%" src="./pictures/parametizable_downscaler.png" alt="Diagramatic view of the downscaler operation/theory.">
+                </div>
+                <p>
+                    &emsp; 
+
+Architecture and Data Flow
+
+The downscaler sits directly in the camera's AXI-Stream pipeline. This direct-stream approach bypasses the DDR memory entirely for the 1080p input.
+
+    Input: Raw 1080p video streamed directly from the camera sensor at a ~75MHz pixel clock.
+
+    Output: A 224x224 RGB frame (~150 KB) written to a /dev/shm RAM disk via a Video Direct Memory Access (VDMA) block.
+
+    Logic: The module utilizes a parameterizable adder tree for the downscaling math, requiring zero DSP slices. Additionally, color channel correction (converting the camera's output to the RGB format expected by MediaPipe) is handled entirely through wire routing on the AXI bus, requiring zero logic gates and adding zero latency.
+
+Processing and Latency
+
+The downscaler's fabric is clocked at 200MHz. At this speed, the theoretical compute time for the RTL logic to process the data is roughly 70 µs. However, because the system is I/O-bound by the camera's live ~75MHz feed, the computation is effectively hidden within the camera's natural exposure and readout time.
+
+To further reduce latency, the downscaler implements a 3/4 frame crop. Since the user's hand gestures naturally occur in the upper portion of the camera's view, the module stops processing and fires its final tlast signal after reading 75% of the 1080p frame.
+Software vs. Hardware Comparison
+
+This hardware implementation minimizes both total latency and CPU utilization.
+
+    Hardware Pipeline: With the 3/4 early-exit crop, the downscaled 224x224 frame is fully processed and committed to memory in approximately 25 ms—before the camera has even finished capturing the bottom 25% of the frame.
+
+    Estimated Software Pipeline: A standard software approach would require waiting for the full 1080p frame to buffer into RAM (~33.3 ms at 30 FPS), followed by a CPU-bound resize operation (estimated at ~30 ms under load). This would result in a total latency of roughly ~63 ms.
+
+By handling the resizing and color swapping inline as the pixels arrive, we eliminate the preprocessing overhead, allowing the Zynq's ARM cores to dedicate their full resources to running the AI inference.
+                </p>
+
+
+            </article>
+        </div>
+
+        <!-- End of content  -->
+        <!-- Bottom of page footer  -->
+
+        <div class="footer">
+            <p>Designed following the principles of <b><a href="http://bettermotherfuckingwebsite.com" style="color:gray;">bettermfwebsite.com</a></b></p>
+        </div>
+    </body>
+
+</html>
