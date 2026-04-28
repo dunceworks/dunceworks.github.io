@@ -49,7 +49,8 @@
                             <p>
                                 Here we can see the abstracted view of the hardware/PL design. Generally, A MIPI CSI camera (PCAM5) clocked at 200MHz feeds into a 
                                 demosaic module (Vivado IP) converting the raw bayer data into standard RGB. Here, the data stream splits. One stream is grayscaled,
-                                while the other stream remains RGB. The RGB stream is then fed into the <b>downscaler (detailed below)</b>
+                                while the other stream remains RGB. The RGB stream is then fed into the <b>downscaler (detailed below)</b> while the grayscale stream
+                                is sent to the mDP output to aid framing the camera feed for the user.
                             </p>
                         </div>
                         
@@ -60,7 +61,7 @@
                 <!--      END DIAGRAM      -->           
 
                 <div class="caption_box centered">
-                    <img style="width: 100%" src="/pictures/parametizable_downscaler.png" alt="Diagramatic view of the downscaler operation/theory.">
+                    <img style="width: 100%" src="/pictures/parametizable_downscaler.png" alt="Diagrammatic view of the downscaler operation/theory.">
                 </div>
                 <h3>Architecture and Data Flow</h3>
                 <p>
@@ -78,7 +79,7 @@
                     &emsp;The downscaler's fabric is clocked at 200MHz giving us a theoretical compute time per frame of around 75 µs based solely on logic. Because we have to wait
                     for the camera to stream in the pixels we are effectively limiting our processing time to around 33 ms due to the effective 75 MHz pixel clock. 
                     Additionally, since we do a fixed crop of only around the top 4/5's of the frame (since we crop only until the bottom 92 pixels), the compute is fully
-                    hidden within the camera's streaming time. Once the last line is processed tlast is asserted, tvalid is deasserted and the frame is committed to memory. 
+                    hidden within the camera's streaming time. Once the last line is processed <code>tlast</code> is asserted, <code>tvalid</code> is deasserted and the frame is committed to memory. 
                 </p>    
                 <br><h3>Software vs. Hardware Comparison</h3>
                 <ul>
@@ -93,7 +94,7 @@
                     a total of 2 RAM writes (one for the full frame, one for the downscaled frame) and additional CPU overhead for downscaling.</li><br><br>
                 </ul>
                 <p>    
-                    Based on this comparison (more of a SWAG), we can see that the hardware pipeline is <i>much</i> faster than a standard software implementation since, while
+                    Based on this analytical comparison, we can see that the hardware pipeline is <i>much</i> faster than a standard software implementation since, while
                     the HW based approach relies on a single 224x224 RAM write (plus negligible processing time), the software approach requires a full 1080p frame 
                     RAM write, non-negligible downscaling time and then a second RAM write for the final frame. The HW approach saves us extra RAM writes and CPU overhead.
                 </p>

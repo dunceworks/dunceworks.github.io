@@ -36,7 +36,7 @@
                     The hardware accelerator substantially reduces CPU and memory overhead for the gesture recognizer, while the software component of the AUP-ZU3 SoC
                     manages the actual detection and classification. 
                     <br>
-                    &emsp;There is additionally several other software components off-board of the AUP-ZU3 that manage
+                    &emsp;There are additionally several other software components off-board of the AUP-ZU3 that manage
                     Side-by-Side (SBS) stereo vision and remote control of a rover using the recognized gestures.
 
 
@@ -52,9 +52,11 @@
                         <div class="project_element">
                             <h2 class="pl">Gesture Acceleration</h2>
                             <p>
-                                Here we can see the abstracted view of the hardware/PL design. Generally, A MIPI CSI camera (PCAM5) clocked at 200MHz feeds into a 
+                                A MIPI CSI camera (PCAM5) clocked at 200MHz feeds into a 
                                 demosaic module (Vivado IP) converting the raw bayer data into standard RGB. Here, the data stream splits. One stream is grayscaled,
-                                while the other stream remains RGB. The RGB stream is then fed into the <b>downscaler (detailed below)</b>
+                                while the other stream remains RGB. The RGB stream is then fed into the <b>downscaler (detailed below)</b> while the grayscale stream
+                                is sent to the mDP output to aid framing the camera feed for the user.
+                                <br> Pictured on the right is a block diagram of the hardware/PL design.
                             </p>
                         </div>
                         
@@ -92,8 +94,8 @@
                         <div class="project_element">
                             <h2 class="pl">Side By Side (SBS) Stereo Vision</h2>
                             <p>
-                                For user vision and to provide updates on the gesture recognizer and rover status, a SBS stereo vision stream is used. A Rubik PI 3 captures 
-                                a full HD (1080p) frame at 60FPS from the front of the headset, intakes data from the AUP-ZU3 via UDP over ethernet, 
+                                For user vision and to provide updates on the gesture recognizer and rover status, a SBS stereo vision stream is used. One Rubik Pi captures 
+                                a full HD (1080p) frame at 60FPS from the rover, intakes data from the AUP-ZU3 via UDP over ethernet, 
                                 and uses that data to display the rover and gesture recognizer status.  
                             </p>
                         </div>
