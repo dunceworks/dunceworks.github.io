@@ -73,7 +73,9 @@
                         <div class="project_element">
                             <h2 class="pl">Gesture Recognition</h2>
                             <p>
-                                
+                                To provide instructions to the rover, the ARM cores (SoC) on the AUP-ZU3 run a gesture recognition pipeline. We run MediaPipe Hands
+                                on a downscaled image to detect the user's hand and extract the gesture. This gesture is then transmitted to the rover and used 
+                                as commands to control the rover's movement.
                             </p>
                         </div>
                         
@@ -109,12 +111,14 @@
                         <div class="project_element">
                             <h2 class="pl">Remote Control (Demo)</h2>
                             <p>
-                                
+                                Our demo showcases a potential use of gesture acceleration in the FAST-AR system to control a rover. The rover receives commands from the AUP-ZU3 and 
+                                transmits video back to the user via a WiFi connection. The user can then use the gesture recognizer to control the rover's movement and receive 
+                                real-time feedback on the rover's status and surroundings through the SBS stereo vision stream.
                             </p>
                         </div>
                         
                         <div class="project_element project_img">
-                            <img src="/pictures/fastar_arch_cropped.png" alt="Gesture controlled rover Demo.">
+                            <img src="/pictures/rover.png" alt="Gesture controlled rover Demo.">
                         </div>
                     </div>
                 </a>

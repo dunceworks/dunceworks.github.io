@@ -33,28 +33,14 @@
                 <div class="caption_box centered">
                     <img style="width: 100%" alt="" src="/pictures/">
                 </div>
-                    <h3>Hardware-Accelerated Video Downscaler</h3>
 
                 <p>
-                    To run the MediaPipe gesture recognition model efficiently on the Zynq Processing System, the 1080p camera feed must be downscaled to a 
-                    224x224 RGB format. Rather than relying on the ARM CPU for image processing, we implemented a custom RTL downscaler in the FPGA fabric 
-                    to handle this step prior to memory storage.
+                    To provide situational awareness, the system features a dedicated video feedback loop. A camera (IMX 708) mounted
+                     on the rover captures live video. This video stream is transmitted to a Rubik Pi 3 located on the user's headset,
+                      which formats the feed into a stereoscopic Side-by-Side display for the AR headset. This decoupled architecture ensures the video pipeline does not interrupt the core FPGA inference tasks.
                 </p>
 
-            
-                <!--      DIAGRAM      -->           
-                    <div class="project_blurb left">
-                        <div class="project_element">
-                            <h2 class="pl">placeholder</h2>
-                            <p>
-                            </p>
-                        </div>
-                        
-                        <div class="project_element project_img">
-                            <img src="/pictures/ alt="Hardware Block Diagram">
-                        </div>
-                    </div>
-                <!--      END DIAGRAM      -->           
+                 
 
 
 
