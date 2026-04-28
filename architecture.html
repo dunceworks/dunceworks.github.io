@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>System Architecture</title>
+        <link rel="stylesheet" href="mainstyle.css">
+        <link rel="icon" type="image/x-icon" href="./pictures/cg_300nm.png">
+    </head>
+
+    <body>
+        <div class="body">
+            <header>
+                <h1>System Architecture</h1>
+            </header>
+            
+            <nav class="header">
+                <a class="largea inline" href="/index.html"><b>FAST-AR</b></a>
+                <a class="largea inline" href="/people.html"><b>Team Members</b></a>
+                <a class="largea inline" href="/architecture.html"><b><i>Architecture</i></b></a>
+                <a class="largea inline" href="/demo.html"><b>Demo</b></a>
+                <a class="largea inline" href="https://github.com/dunceworks/FAST-AR"><b>Repository (external)</b></a>
+            </nav>
+
+        <!-- Start of content  -->
+
+        <!-- Descriptions of projects with links  -->
+
+            <article class="page_content"> 
+                <h2><i>Overall Architecture</i></h2>
+
+                <p>
+                    &emsp;
+                    The overall architecture of FAST-AR utilizes both a dedicated hardware/PL accelerator along with multiple software/PS components.
+                    The hardware accelerator substantially reduces CPU and memory overhead for the gesture recognizer, while the software component of the AUP-ZU3 SoC
+                    manages the actual detection and classification. 
+                    <br>
+                    &emsp;There is additionally several other software components off-board of the AUP-ZU3 that manage
+                    Side-by-Side (SBS) stereo vision and remote control of a rover using the recognized gestures.
+
+
+                </p>
+
+
+                <h2>Hardware-Accelerated Architecture</h2>
+
+            
+                <!--      HARDWARE BLURB      -->        
+                <a href="/system_arch/gesture_acceleration.html" class="text">                
+                    <div class="project_blurb left" >
+                        <div class="project_element">
+                            <h2 class="pl">Gesture Acceleration</h2>
+                            <p>
+                                Here we can see the abstracted view of the hardware/PL design. Generally, A MIPI CSI camera (PCAM5) clocked at 200MHz feeds into a 
+                                demosaic module (Vivado IP) converting the raw bayer data into standard RGB. Here, the data stream splits. One stream is grayscaled,
+                                while the other stream remains RGB. The RGB stream is then fed into the <b>downscaler (detailed below)</b>
+                            </p>
+                        </div>
+                        
+                        <div class="project_element project_img">
+                            <img src="/pictures/fastar_arch_cropped.png" alt="Hardware Block Diagram">
+                        </div>
+                    </div>
+                </a>
+                <!--      END HARDWARE BLURB      -->           
+
+                <h2>Software Architecture</h2>
+                            
+                <!--      GESTURE REC BLURB      -->        
+                <a href="/system_arch/gesture_rec.html" class="text">   
+                    <div class="project_blurb right">
+                        <div class="project_element">
+                            <h2 class="pl">Gesture Recognition</h2>
+                            <p>
+                                
+                            </p>
+                        </div>
+                        
+                        <div class="project_element project_img">
+                            <img src="/pictures/224_up10.png" alt="A thumbs up gesture that was used for training our model (224x224 RGB input format).">
+                        </div>
+                    </div>
+                </a>
+                <!--      END GESTURE REC BLURB      -->
+                      
+                <!--      SBS BLURB      -->    
+                <a href="/system_arch/sbs_video.html" class="text">       
+                    <div class="project_blurb left">
+                        <div class="project_element">
+                            <h2 class="pl">Side By Side (SBS) Stereo Vision</h2>
+                            <p>
+                                For user vision and to provide updates on the gesture recognizer and rover status, a SBS stereo vision stream is used. A Rubik PI 3 captures 
+                                a full HD (1080p) frame at 60FPS from the front of the headset, intakes data from the AUP-ZU3 via UDP over ethernet, 
+                                and uses that data to display the rover and gesture recognizer status.  
+                            </p>
+                        </div>
+                        
+                        <div class="project_element project_img">
+                            <img src="/pictures/frame_stitch_camel.png" alt="Side by side stereo vision example with a camel.">
+                        </div>
+                    </div>
+                </a>
+                <!--      END SBS BLURB      -->    
+
+                <!--      REMOTE BLURB      -->    
+                <a href="demo.html" class="text">      
+                    <div class="project_blurb right">
+                        <div class="project_element">
+                            <h2 class="pl">Remote Control (Demo)</h2>
+                            <p>
+                                
+                            </p>
+                        </div>
+                        
+                        <div class="project_element project_img">
+                            <img src="/pictures/fastar_arch_cropped.png" alt="Gesture controlled rover Demo.">
+                        </div>
+                    </div>
+                </a>
+                <!--      END REMOTE BLURB      -->
+
+
+            </article>
+        </div>
+
+        <!-- End of content  -->
+        <!-- Bottom of page footer  -->
+
+        <div class="footer">
+            <p>Designed following the principles of <b><a href="http://bettermotherfuckingwebsite.com" style="color:gray;">bettermfwebsite.com</a></b></p>
+        </div>
+    </body>
+
+</html>
